@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+
+<!--
+ * @author      Andreas Knollmann
+ * @copyright   2014-2023 Softwareentwicklung Andreas Knollmann
+ * @license     http://www.opensource.org/licenses/mit-license.php MIT
+//-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Psr\Log\LoggerInterface" type="Infrangible\Log\Logger\Wrapper" />
+    <type name="Infrangible\Log\Logger\Wrapper">
+        <arguments>
+            <argument name="defaultLogger" xsi:type="object">Magento\Framework\Logger\Monolog</argument>
+        </arguments>
+    </type>
+</config>

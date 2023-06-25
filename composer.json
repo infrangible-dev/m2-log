@@ -1,0 +1,31 @@
+{
+    "name": "infrangible/m2-log",
+    "description": "Infrangible Magento 2 Log Wrapper",
+    "type": "magento2-module",
+    "version": "1.0.0",
+    "license": "MIT",
+    "keywords": [
+        "Magento"
+    ],
+    "homepage": "https://github.com/infrangible-dev/m2-log",
+    "authors": [
+        {
+            "name": "Andreas Knollmann",
+            "email": "a.knollmann@infrangible.dev",
+            "homepage": "https://www.infrangible.dev",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=7.1",
+        "magento/framework": "~100.1.0|~101.0.0|~102.0.0|~103.0.0"
+    },
+    "autoload": {
+        "files": [
+            "src/registration.php"
+        ],
+        "psr-4": {
+            "Infrangible\\Log\\": "src"
+        }
+    }
+}
