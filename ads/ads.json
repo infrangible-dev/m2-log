@@ -7,7 +7,7 @@
         "magento2-module-demo.json"
     ],
     "global": {
-        "systemName": "m2_log",
+        "systemName": "infrangible_m2_log",
         "webServerType": "apache_php",
         "webServerVersion": "2.4",
         "phpVersion": "8.1",
