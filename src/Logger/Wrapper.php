@@ -6,20 +6,17 @@ use Psr\Log\LoggerInterface;
 
 /**
  * @author      Andreas Knollmann
- * @copyright   2014-2023 Softwareentwicklung Andreas Knollmann
+ * @copyright   2014-2026 Softwareentwicklung Andreas Knollmann
  * @license     http://www.opensource.org/licenses/mit-license.php MIT
  */
-class Wrapper
-    implements LoggerInterface
+class Wrapper implements LoggerInterface
 {
-    /** @var LoggerInterface */
-    private $defaultLogger;
+    private ?LoggerInterface $defaultLogger;
 
     /** @var LoggerInterface[] */
-    private $loggers = [];
+    private array $loggers = [];
 
-    /** @var bool */
-    private $initialized = false;
+    private bool $initialized = false;
 
     /**
      * @param LoggerInterface|null $defaultLogger
@@ -29,21 +26,15 @@ class Wrapper
         $this->defaultLogger = $defaultLogger;
     }
 
-    /**
-     * @return void
-     */
-    protected function checkInitialized()
+    protected function checkInitialized(): void
     {
-        if ( ! $this->initialized) {
+        if (! $this->initialized) {
             $this->initialize();
             $this->initialized = true;
         }
     }
 
-    /**
-     * @return void
-     */
-    public function initialize()
+    public function initialize(): void
     {
         if ($this->defaultLogger !== null) {
             $this->addLoggers([$this->defaultLogger]);
@@ -53,7 +44,7 @@ class Wrapper
     /**
      * @param LoggerInterface[] $loggers
      */
-    public function addLoggers(array $loggers = [])
+    public function addLoggers(array $loggers = []): void
     {
         foreach ($loggers as $logger) {
             if ($logger instanceof LoggerInterface) {
@@ -64,18 +55,16 @@ class Wrapper
 
     /**
      * System is unusable.
-     *
-     * @param string $message
-     * @param array  $context
-     *
-     * @return void
      */
-    public function emergency($message, array $context = [])
+    public function emergency(string|\Stringable $message, array $context = []): void
     {
         $this->checkInitialized();
 
         foreach ($this->loggers as $logger) {
-            $logger->emergency($message, $context);
+            $logger->emergency(
+                $message,
+                $context
+            );
         }
     }
 
@@ -83,54 +72,48 @@ class Wrapper
      * Action must be taken immediately.
      * Example: Entire website down, database unavailable, etc. This should
      * trigger the SMS alerts and wake you up.
-     *
-     * @param string $message
-     * @param array  $context
-     *
-     * @return void
      */
-    public function alert($message, array $context = [])
+    public function alert(string|\Stringable $message, array $context = []): void
     {
         $this->checkInitialized();
 
         foreach ($this->loggers as $logger) {
-            $logger->alert($message, $context);
+            $logger->alert(
+                $message,
+                $context
+            );
         }
     }
 
     /**
      * Critical conditions.
      * Example: Application component unavailable, unexpected exception.
-     *
-     * @param string $message
-     * @param array  $context
-     *
-     * @return void
      */
-    public function critical($message, array $context = [])
+    public function critical(string|\Stringable $message, array $context = []): void
     {
         $this->checkInitialized();
 
         foreach ($this->loggers as $logger) {
-            $logger->critical($message, $context);
+            $logger->critical(
+                $message,
+                $context
+            );
         }
     }
 
     /**
      * Runtime errors that do not require immediate action but should typically
      * be logged and monitored.
-     *
-     * @param string $message
-     * @param array  $context
-     *
-     * @return void
      */
-    public function error($message, array $context = [])
+    public function error(string|\Stringable $message, array $context = []): void
     {
         $this->checkInitialized();
 
         foreach ($this->loggers as $logger) {
-            $logger->error($message, $context);
+            $logger->error(
+                $message,
+                $context
+            );
         }
     }
 
@@ -138,88 +121,80 @@ class Wrapper
      * Exceptional occurrences that are not errors.
      * Example: Use of deprecated APIs, poor use of an API, undesirable things
      * that are not necessarily wrong.
-     *
-     * @param string $message
-     * @param array  $context
-     *
-     * @return void
      */
-    public function warning($message, array $context = [])
+    public function warning(string|\Stringable $message, array $context = []): void
     {
         $this->checkInitialized();
 
         foreach ($this->loggers as $logger) {
-            $logger->warning($message, $context);
+            $logger->warning(
+                $message,
+                $context
+            );
         }
     }
 
     /**
      * Normal but significant events.
-     *
-     * @param string $message
-     * @param array  $context
-     *
-     * @return void
      */
-    public function notice($message, array $context = [])
+    public function notice(string|\Stringable $message, array $context = []): void
     {
         $this->checkInitialized();
 
         foreach ($this->loggers as $logger) {
-            $logger->notice($message, $context);
+            $logger->notice(
+                $message,
+                $context
+            );
         }
     }
 
     /**
      * Interesting events.
      * Example: User logs in, SQL logs.
-     *
-     * @param string $message
-     * @param array  $context
-     *
-     * @return void
      */
-    public function info($message, array $context = [])
+    public function info(string|\Stringable $message, array $context = []): void
     {
         $this->checkInitialized();
 
         foreach ($this->loggers as $logger) {
-            $logger->info($message, $context);
+            $logger->info(
+                $message,
+                $context
+            );
         }
     }
 
     /**
      * Detailed debug information.
-     *
-     * @param string $message
-     * @param array  $context
-     *
-     * @return void
      */
-    public function debug($message, array $context = [])
+    public function debug(string|\Stringable $message, array $context = []): void
     {
         $this->checkInitialized();
 
         foreach ($this->loggers as $logger) {
-            $logger->debug($message, $context);
+            $logger->debug(
+                $message,
+                $context
+            );
         }
     }
 
     /**
      * Logs with an arbitrary level.
      *
-     * @param mixed  $level
-     * @param string $message
-     * @param array  $context
-     *
-     * @return void
+     * @param mixed $level
      */
-    public function log($level, $message, array $context = [])
+    public function log($level, string|\Stringable $message, array $context = []): void
     {
         $this->checkInitialized();
 
         foreach ($this->loggers as $logger) {
-            $logger->log($level, $message, $context);
+            $logger->log(
+                $level,
+                $message,
+                $context
+            );
         }
     }
 }
