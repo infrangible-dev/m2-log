@@ -1,39 +1,57 @@
 <?php
 
-namespace Infrangible\Log\Logger;
-
-use Psr\Log\LoggerInterface;
+declare(strict_types=1);
 
 /**
  * @author      Andreas Knollmann
- * @copyright   2014-2026 Softwareentwicklung Andreas Knollmann
+ * @copyright   Copyright (c) 2014-2026 Softwareentwicklung Andreas Knollmann
  * @license     http://www.opensource.org/licenses/mit-license.php MIT
+ */
+
+namespace Infrangible\Log\Logger;
+
+use Psr\Log\LoggerInterface;
+use Stringable;
+
+/**
+ * Passes every log record to several loggers.
+ *
+ * The first logger is the default logger, Magento's logger. Other modules add their loggers with a plugin after the
+ * method initialize(), which is called before the first record is logged.
  */
 class Wrapper implements LoggerInterface
 {
-    private ?LoggerInterface $defaultLogger;
-
     /** @var LoggerInterface[] */
     private array $loggers = [];
 
+    /** @var bool */
     private bool $initialized = false;
 
     /**
      * @param LoggerInterface|null $defaultLogger
      */
-    public function __construct(LoggerInterface $defaultLogger = null)
+    public function __construct(private readonly ?LoggerInterface $defaultLogger = null)
     {
-        $this->defaultLogger = $defaultLogger;
     }
 
+    /**
+     * Initializes the loggers before the first record is logged.
+     *
+     * @return void
+     */
     protected function checkInitialized(): void
     {
         if (! $this->initialized) {
-            $this->initialize();
             $this->initialized = true;
+            $this->initialize();
         }
     }
 
+    /**
+     * Adds the default logger. Plugins after this method add more loggers.
+     *
+     * @return void
+     */
     public function initialize(): void
     {
         if ($this->defaultLogger !== null) {
@@ -42,141 +60,159 @@ class Wrapper implements LoggerInterface
     }
 
     /**
-     * @param LoggerInterface[] $loggers
+     * Adds loggers. Values that are no loggers, and the wrapper itself, are ignored.
+     *
+     * @param array $loggers
+     * @phpstan-param array<int|string, mixed> $loggers
+     *
+     * @return void
      */
     public function addLoggers(array $loggers = []): void
     {
         foreach ($loggers as $logger) {
-            if ($logger instanceof LoggerInterface) {
+            if ($logger instanceof LoggerInterface && $logger !== $this) {
                 $this->loggers[] = $logger;
             }
         }
     }
 
     /**
+     * Returns the loggers that get the records.
+     *
+     * @return LoggerInterface[]
+     */
+    public function getLoggers(): array
+    {
+        $this->checkInitialized();
+
+        return $this->loggers;
+    }
+
+    /**
      * System is unusable.
+     *
+     * @param string|Stringable $message
+     * @param array $context
+     * @phpstan-param array<int|string, mixed> $context
+     *
+     * @return void
      */
-    public function emergency(string|\Stringable $message, array $context = []): void
+    public function emergency(string|Stringable $message, array $context = []): void
     {
-        $this->checkInitialized();
-
-        foreach ($this->loggers as $logger) {
-            $logger->emergency(
-                $message,
-                $context
-            );
+        foreach ($this->getLoggers() as $logger) {
+            $logger->emergency($message, $context);
         }
     }
 
     /**
-     * Action must be taken immediately.
-     * Example: Entire website down, database unavailable, etc. This should
-     * trigger the SMS alerts and wake you up.
+     * Action must be taken immediately, for example when the entire website is down.
+     *
+     * @param string|Stringable $message
+     * @param array $context
+     * @phpstan-param array<int|string, mixed> $context
+     *
+     * @return void
      */
-    public function alert(string|\Stringable $message, array $context = []): void
+    public function alert(string|Stringable $message, array $context = []): void
     {
-        $this->checkInitialized();
-
-        foreach ($this->loggers as $logger) {
-            $logger->alert(
-                $message,
-                $context
-            );
+        foreach ($this->getLoggers() as $logger) {
+            $logger->alert($message, $context);
         }
     }
 
     /**
-     * Critical conditions.
-     * Example: Application component unavailable, unexpected exception.
+     * Critical conditions, for example an unavailable component or an unexpected exception.
+     *
+     * @param string|Stringable $message
+     * @param array $context
+     * @phpstan-param array<int|string, mixed> $context
+     *
+     * @return void
      */
-    public function critical(string|\Stringable $message, array $context = []): void
+    public function critical(string|Stringable $message, array $context = []): void
     {
-        $this->checkInitialized();
-
-        foreach ($this->loggers as $logger) {
-            $logger->critical(
-                $message,
-                $context
-            );
+        foreach ($this->getLoggers() as $logger) {
+            $logger->critical($message, $context);
         }
     }
 
     /**
-     * Runtime errors that do not require immediate action but should typically
-     * be logged and monitored.
+     * Runtime errors that do not require immediate action but should be logged and monitored.
+     *
+     * @param string|Stringable $message
+     * @param array $context
+     * @phpstan-param array<int|string, mixed> $context
+     *
+     * @return void
      */
-    public function error(string|\Stringable $message, array $context = []): void
+    public function error(string|Stringable $message, array $context = []): void
     {
-        $this->checkInitialized();
-
-        foreach ($this->loggers as $logger) {
-            $logger->error(
-                $message,
-                $context
-            );
+        foreach ($this->getLoggers() as $logger) {
+            $logger->error($message, $context);
         }
     }
 
     /**
-     * Exceptional occurrences that are not errors.
-     * Example: Use of deprecated APIs, poor use of an API, undesirable things
-     * that are not necessarily wrong.
+     * Exceptional occurrences that are not errors, for example the use of deprecated APIs.
+     *
+     * @param string|Stringable $message
+     * @param array $context
+     * @phpstan-param array<int|string, mixed> $context
+     *
+     * @return void
      */
-    public function warning(string|\Stringable $message, array $context = []): void
+    public function warning(string|Stringable $message, array $context = []): void
     {
-        $this->checkInitialized();
-
-        foreach ($this->loggers as $logger) {
-            $logger->warning(
-                $message,
-                $context
-            );
+        foreach ($this->getLoggers() as $logger) {
+            $logger->warning($message, $context);
         }
     }
 
     /**
      * Normal but significant events.
+     *
+     * @param string|Stringable $message
+     * @param array $context
+     * @phpstan-param array<int|string, mixed> $context
+     *
+     * @return void
      */
-    public function notice(string|\Stringable $message, array $context = []): void
+    public function notice(string|Stringable $message, array $context = []): void
     {
-        $this->checkInitialized();
-
-        foreach ($this->loggers as $logger) {
-            $logger->notice(
-                $message,
-                $context
-            );
+        foreach ($this->getLoggers() as $logger) {
+            $logger->notice($message, $context);
         }
     }
 
     /**
-     * Interesting events.
-     * Example: User logs in, SQL logs.
+     * Interesting events, for example a login of a customer.
+     *
+     * @param string|Stringable $message
+     * @param array $context
+     * @phpstan-param array<int|string, mixed> $context
+     *
+     * @return void
      */
-    public function info(string|\Stringable $message, array $context = []): void
+    public function info(string|Stringable $message, array $context = []): void
     {
-        $this->checkInitialized();
-
-        foreach ($this->loggers as $logger) {
-            $logger->info(
-                $message,
-                $context
-            );
+        foreach ($this->getLoggers() as $logger) {
+            $logger->info($message, $context);
         }
     }
 
     /**
      * Detailed debug information.
+     *
+     * @param string|Stringable $message
+     * @param array $context
+     * @phpstan-param array<int|string, mixed> $context
+     *
+     * @return void
      */
-    public function debug(string|\Stringable $message, array $context = []): void
+    public function debug(string|Stringable $message, array $context = []): void
     {
-        $this->checkInitialized();
-
-        foreach ($this->loggers as $logger) {
-            $logger->debug(
-                $message,
-                $context
-            );
+        foreach ($this->getLoggers() as $logger) {
+            $logger->debug($message, $context);
         }
     }
 
@@ -184,17 +220,16 @@ class Wrapper implements LoggerInterface
      * Logs with an arbitrary level.
      *
      * @param mixed $level
+     * @param string|Stringable $message
+     * @param array $context
+     * @phpstan-param array<int|string, mixed> $context
+     *
+     * @return void
      */
-    public function log($level, string|\Stringable $message, array $context = []): void
+    public function log($level, string|Stringable $message, array $context = []): void
     {
-        $this->checkInitialized();
-
-        foreach ($this->loggers as $logger) {
-            $logger->log(
-                $level,
-                $message,
-                $context
-            );
+        foreach ($this->getLoggers() as $logger) {
+            $logger->log($level, $message, $context);
         }
     }
 }
