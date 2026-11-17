@@ -87,6 +87,7 @@ class WrapperTest extends TestCase
         $defaultLogger = new RecordingLogger();
 
         $wrapper = new class ($defaultLogger) extends Wrapper {
+            /** @var int */
             public int $initializations = 0;
 
             /**
@@ -126,4 +127,3 @@ class WrapperTest extends TestCase
         $this->assertSame([], $wrapper->getLoggers());
     }
 }
-
