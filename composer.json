@@ -1,11 +1,14 @@
 {
     "name": "infrangible/m2-log",
-    "description": "Infrangible Magento 2 Log Wrapper",
+    "description": "Technical helper that lets Infrangible modules write log messages to several log files at once.",
     "type": "magento2-module",
     "version": "3.0.0",
     "license": "MIT",
     "keywords": [
-        "Magento"
+        "Magento",
+        "Magento 2",
+        "Adobe Commerce",
+        "Developer tools"
     ],
     "homepage": "https://www.infrangible.dev/modules/log",
     "authors": [
