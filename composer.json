@@ -2,7 +2,7 @@
     "name": "infrangible/m2-log",
     "description": "Technical helper that lets Infrangible modules write log messages to several log files at once.",
     "type": "magento2-module",
-    "version": "3.0.0",
+    "version": "3.0.1",
     "license": "MIT",
     "keywords": [
         "Magento",
@@ -20,7 +20,7 @@
         }
     ],
     "require": {
-        "php": ">=8.2",
+        "php": ">=8.1",
         "infrangible/m2-foundation": "~3.0.1",
         "magento/framework": "~103.0.6",
         "psr/log": "~2.0.0||~3.0.0"
